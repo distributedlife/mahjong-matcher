@@ -32,22 +32,22 @@ public class MatchingHandFilter {
         return filteredMatches;
     }
 
-    public List<Match> findAllHandsWithAtLeastOneMatchShould(List<String> tilesInHand) {
+    public List<Match> findAllHandsWithAtLeastOneMatch(List<String> tilesInHand) {
         List<Match> allMatches = new ArrayList<Match>();
 
         for (Hand potentialHand : handLibrary) {
             List<String> tilesLeftInHand = new ArrayList<String>(tilesInHand);
+            List<String> matchingTiles = new ArrayList<String>();
 
-            int numberOfMatchingTiles = 0;
             for (String requiredTile : potentialHand.getRequiredTiles()) {
                 if(tilesLeftInHand.contains(requiredTile)) {
-                    numberOfMatchingTiles++;
                     tilesLeftInHand.remove(requiredTile);
+                    matchingTiles.add(requiredTile);
                 }
             }
 
-            if (numberOfMatchingTiles > 0) {
-                allMatches.add(new Match(potentialHand.getName(), numberOfMatchingTiles));
+            if (matchingTiles.size() > 0) {
+                allMatches.add(new Match(potentialHand.getName(), matchingTiles.size(), matchingTiles, potentialHand.getRequiredTiles()));
             }
         }
 
@@ -62,5 +62,19 @@ public class MatchingHandFilter {
         }
 
         return -1;
+    }
+
+    public List<Match> ignoreHandsWithOwnWind(List<Match> unfilteredMatches) {
+        List<Match> filteredMatches = new ArrayList<Match>();
+
+        for (Match match : unfilteredMatches) {
+            if (match.getRequiredTiles().contains("OwnWind")) {
+                continue;
+            }
+
+            filteredMatches.add(match);
+        }
+
+        return filteredMatches;
     }
 }

@@ -78,14 +78,9 @@ public class MahJongHandMatcherTest {
         handLibrary.add(new Hand("Red Lantern", redLantern()));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
-        List<Match> matches = mahJongHandMatcher.getMatches(hand);
         List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatchesWithOwnWind(hand, TileSet.Winds.West);
 
-        assertThat(matches.size(), is(1));
         assertThat(matchesWithOwnWind.size(), is(1));
-
-        assertThat(matches.get(0).getName(), is("Red Lantern"));
-        assertThat(matches.get(0).getCount(), is(2));
 
         assertThat(matchesWithOwnWind.get(0).getName(), is("Red Lantern"));
         assertThat(matchesWithOwnWind.get(0).getCount(), is(3));

@@ -15,8 +15,8 @@ public class MatchingHandFilterTest {
     public void keepOnlyBestShouldFilterOutDuplicatesKeepingHighestCount() {
         MatchingHandFilter matchingHandFilter = new MatchingHandFilter(new ArrayList<Hand>());
         List<Match> unfilteredMatches = new ArrayList<Match>();
-        unfilteredMatches.add(new Match("Best", 10));
-        unfilteredMatches.add(new Match("Best", 9));
+        unfilteredMatches.add(new Match("Best", 10, null, null));
+        unfilteredMatches.add(new Match("Best", 9, null, null));
 
         List<Match> matches = matchingHandFilter.keepOnlyBest(unfilteredMatches);
 
@@ -29,8 +29,8 @@ public class MatchingHandFilterTest {
     public void keepOnlyBestShouldPickFirstInCaseOfATie() {
         MatchingHandFilter matchingHandFilter = new MatchingHandFilter(new ArrayList<Hand>());
         List<Match> unfilteredMatches = new ArrayList<Match>();
-        unfilteredMatches.add(new Match("Best", 10));
-        unfilteredMatches.add(new Match("Best", 10));
+        unfilteredMatches.add(new Match("Best", 10, null, null));
+        unfilteredMatches.add(new Match("Best", 10, null, null));
 
         List<Match> matches = matchingHandFilter.keepOnlyBest(unfilteredMatches);
 
@@ -56,7 +56,7 @@ public class MatchingHandFilterTest {
         hand.add("1 Bamboo");
 
         MatchingHandFilter matchingHandFilter = new MatchingHandFilter(handLibrary);
-        List<Match> matches = matchingHandFilter.findAllHandsWithAtLeastOneMatchShould(hand);
+        List<Match> matches = matchingHandFilter.findAllHandsWithAtLeastOneMatch(hand);
 
         assertThat(matches.size(), is(2));
         assertThat(matches.get(0).getName(), is("First"));

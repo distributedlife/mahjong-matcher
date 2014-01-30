@@ -15,8 +15,8 @@ public class MatchingHandSorterTest {
         MatchingHandSorter matchingHandSorter = new MatchingHandSorter();
 
         List<Match> unsortedMatches = new ArrayList<Match>();
-        unsortedMatches.add(new Match("should be second", 5));
-        unsortedMatches.add(new Match("should be first", 10));
+        unsortedMatches.add(new Match("should be second", 5, null, null));
+        unsortedMatches.add(new Match("should be first", 10, null, null));
 
         List<Match> sortedMatches = matchingHandSorter.sortByMostMatches(unsortedMatches);
 
@@ -29,8 +29,8 @@ public class MatchingHandSorterTest {
         MatchingHandSorter matchingHandSorter = new MatchingHandSorter();
 
         List<Match> unsortedMatches = new ArrayList<Match>();
-        unsortedMatches.add(new Match("samuel", 10));
-        unsortedMatches.add(new Match("sammy", 10));
+        unsortedMatches.add(new Match("samuel", 10, null, null));
+        unsortedMatches.add(new Match("sammy", 10, null, null));
 
         List<Match> sortedMatches = matchingHandSorter.sortByMostMatches(unsortedMatches);
 

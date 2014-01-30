@@ -5,12 +5,16 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/test/resources" type="java-test-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="junit-4.11" level="project" />
-    <orderEntry type="library" name="hamcrest-core-1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="junit-4.11" level="project" />
+    <orderEntry type="library" scope="TEST" name="hamcrest-core-1.3" level="project" />
     <orderEntry type="library" name="mahjong-reference" level="project" />
+    <orderEntry type="library" name="json-20131018" level="project" />
+    <orderEntry type="library" name="commons-io-2.4" level="project" />
   </component>
 </module>
 

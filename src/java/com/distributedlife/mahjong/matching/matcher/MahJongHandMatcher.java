@@ -7,7 +7,7 @@ import com.distributedlife.mahjong.reference.data.TileSet;
 import java.util.ArrayList;
 import java.util.List;
 
-class MahJongHandMatcher {
+public class MahJongHandMatcher {
     private final MatchingHandSorter sorter;
     private final MatchingHandFilter filter;
 
@@ -18,8 +18,10 @@ class MahJongHandMatcher {
 
     public List<Match> getMatches(List<String> tilesInHand) {
         return sorter.sortByMostMatches(
-                filter.keepOnlyBest(
-                        filter.findAllHandsWithAtLeastOneMatchShould(tilesInHand)
+                filter.ignoreHandsWithOwnWind(
+                        filter.keepOnlyBest(
+                            filter.findAllHandsWithAtLeastOneMatch(tilesInHand)
+                        )
                 )
         );
     }
@@ -34,6 +36,10 @@ class MahJongHandMatcher {
             }
         }
 
-        return getMatches(tilesInHandWithOwnWind);
+        return sorter.sortByMostMatches(
+            filter.keepOnlyBest(
+                filter.findAllHandsWithAtLeastOneMatch(tilesInHandWithOwnWind)
+            )
+        );
     }
 }
