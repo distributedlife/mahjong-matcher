@@ -4,6 +4,7 @@ import com.distributedlife.mahjong.matching.matcher.Match;
 import com.distributedlife.mahjong.reference.hand.Hand;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MatchingHandFilter {
@@ -39,6 +40,15 @@ public class MatchingHandFilter {
             List<String> tilesLeftInHand = new ArrayList<String>(tilesInHand);
             List<String> matchingTiles = new ArrayList<String>();
 
+            if (potentialHand.getName().equals("Seven Twins")) {
+                Match match = handleSevenTwinsHand(tilesInHand);
+                if (match != null) {
+                    allMatches.add(match);
+                }
+
+                continue;
+            }
+
             for (String requiredTile : potentialHand.getRequiredTiles()) {
                 if(tilesLeftInHand.contains(requiredTile)) {
                     tilesLeftInHand.remove(requiredTile);
@@ -52,6 +62,45 @@ public class MatchingHandFilter {
         }
 
         return allMatches;
+    }
+
+    private Match handleSevenTwinsHand(List<String> tilesInHand) {
+        List<String> sevenTwinsMatchingTiles = new ArrayList<String>();
+        for (String tile : tilesInHand) {
+            if (sevenTwinsMatchingTiles.contains(tile)) {
+                continue;
+            }
+
+            if (Collections.frequency(tilesInHand, tile) == 2) {
+                sevenTwinsMatchingTiles.add(tile);
+                sevenTwinsMatchingTiles.add(tile);
+            }
+            if (Collections.frequency(tilesInHand, tile) == 3) {
+                sevenTwinsMatchingTiles.add(tile);
+                sevenTwinsMatchingTiles.add(tile);
+            }
+            if (Collections.frequency(tilesInHand, tile) == 4) {
+                sevenTwinsMatchingTiles.add(tile);
+                sevenTwinsMatchingTiles.add(tile);
+                sevenTwinsMatchingTiles.add(tile);
+                sevenTwinsMatchingTiles.add(tile);
+            }
+        }
+
+        if (sevenTwinsMatchingTiles.size() > 0) {
+            List<String> requiredTiles = new ArrayList<String>(sevenTwinsMatchingTiles);
+            for (String tile : tilesInHand) {
+                if (sevenTwinsMatchingTiles.size() == 14) {
+                    break;
+                }
+
+                requiredTiles.add(tile);
+            }
+
+            return new Match("Seven Twins", sevenTwinsMatchingTiles.size(), sevenTwinsMatchingTiles, requiredTiles);
+        }
+
+        return null;
     }
 
     private static int getIndexOfHand(String name, List<Match> matches) {
