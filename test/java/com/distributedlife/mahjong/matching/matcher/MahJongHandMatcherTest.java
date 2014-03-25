@@ -9,20 +9,24 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.core.Is.is;
+import static com.distributedlife.mahjong.reference.data.TileSet.Tile;
+import static com.distributedlife.mahjong.reference.data.TileSet.Winds;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class MahJongHandMatcherTest {
     @Test
     public void shouldMatchEntriesInTheHandLibrary() {
-        List<String> hand = new ArrayList<String>();
-        hand.add("1 Bamboo");
-
         List<Hand> handLibrary = new ArrayList<Hand>();
         handLibrary.add(new Hand("Run, Pung and a Pair", runPungAndAPairBamboo()));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
-        List<Match> matches = mahJongHandMatcher.getMatches(hand);
+        List<Match> matches = mahJongHandMatcher.getMatches(
+                Tile.B1.v,
+                0L,
+                0L,
+                0L
+        );
         assertThat(matches.get(0).getName(), is("Run, Pung and a Pair"));
         assertThat(matches.get(0).getCount(), is(1));
         assertThat(matches.size(), is(1));
@@ -30,17 +34,17 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldPickTheBestMatchForAHand() {
-        List<String> hand = new ArrayList<String>();
-        hand.add("1 Bamboo");
-        hand.add("2 Spot");
-        hand.add("2 Spot");
-
         List<Hand> handLibrary = new ArrayList<Hand>();
         handLibrary.add(new Hand("Run, Pung and a Pair", runPungAndAPairBamboo()));
         handLibrary.add(new Hand("Run, Pung and a Pair", runPungAndAPairSpot()));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
-        List<Match> matches = mahJongHandMatcher.getMatches(hand);
+        List<Match> matches = mahJongHandMatcher.getMatches(
+                Tile.B1.v + Tile.S2.v,
+                Tile.S2.v,
+                0L,
+                0L
+        );
         assertThat(matches.get(0).getName(), is("Run, Pung and a Pair"));
         assertThat(matches.get(0).getCount(), is(2));
         assertThat(matches.size(), is(1));
@@ -48,17 +52,17 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldMatchEachDifferentHandOrderedByMatchCount() {
-        List<String> hand = new ArrayList<String>();
-        hand.add("2 Spot");
-        hand.add("8 Spot");
-        hand.add("8 Spot");
-
         List<Hand> handLibrary = new ArrayList<Hand>();
         handLibrary.add(new Hand("Run, Pung and a Pair", runPungAndAPairSpot()));
         handLibrary.add(new Hand("Gates of Heaven", gatesOfHeaven()));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
-        List<Match> matches = mahJongHandMatcher.getMatches(hand);
+        List<Match> matches = mahJongHandMatcher.getMatches(
+                Tile.S2.v + Tile.S8.v,
+                Tile.S8.v,
+                0L,
+                0L
+        );
         assertThat(matches.size(), is(2));
 
         assertThat(matches.get(0).getName(), is("Gates of Heaven"));
@@ -69,16 +73,17 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldConvertWindIntoOwnWindAndMatchAgain() {
-        List<String> hand = new ArrayList<String>();
-        hand.add("2 Spot");
-        hand.add("8 Spot");
-        hand.add("West");
-
         List<Hand> handLibrary = new ArrayList<Hand>();
         handLibrary.add(new Hand("Red Lantern", redLantern()));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
-        List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatchesWithOwnWind(hand, TileSet.Winds.West);
+        List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatchesWithOwnWind(
+                Tile.S2.v + Tile.S8.v + Tile.WW.v,
+                0L,
+                0L,
+                0L,
+                Winds.West
+        );
 
         assertThat(matchesWithOwnWind.size(), is(1));
 
@@ -88,16 +93,16 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldReturnASevenPairsHandIfAtLeastOnePairExists() {
-        List<String> hand = new ArrayList<String>();
-        hand.add("2 Spot");
-        hand.add("2 Spot");
-        hand.add("8 Spot");
-
         List<Hand> handLibrary = new ArrayList<Hand>();
         handLibrary.add(new Hand("Seven Twins", null));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
-        List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatches(hand);
+        List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatches(
+                Tile.S2.v + Tile.S8.v,
+                Tile.S2.v,
+                0L,
+                0L
+        );
 
         assertThat(matchesWithOwnWind.size(), is(1));
 
@@ -116,27 +121,31 @@ public class MahJongHandMatcherTest {
         handLibrary.add(new Hand("Seven Twins", null));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
-        List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatches(hand);
+        List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatches(
+                Tile.S2.v,
+                Tile.S2.v,
+                Tile.S2.v,
+                0L
+        );
 
         assertThat(matchesWithOwnWind.size(), is(1));
 
         assertThat(matchesWithOwnWind.get(0).getName(), is("Seven Twins"));
-        assertThat(matchesWithOwnWind.get(0).getCount(), is(2));
+        assertThat(matchesWithOwnWind.get(0).getCount(), is(3));
     }
 
     @Test
     public void shouldReturnASevenPairsHandIfAtKongExists() {
-        List<String> hand = new ArrayList<String>();
-        hand.add("2 Spot");
-        hand.add("2 Spot");
-        hand.add("2 Spot");
-        hand.add("2 Spot");
-
         List<Hand> handLibrary = new ArrayList<Hand>();
         handLibrary.add(new Hand("Seven Twins", null));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
-        List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatches(hand);
+        List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatches(
+                Tile.S2.v,
+                Tile.S2.v,
+                Tile.S2.v,
+                Tile.S2.v
+        );
 
         assertThat(matchesWithOwnWind.size(), is(1));
 
@@ -146,16 +155,16 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldNotReturnASevenPairsHandIfNoPairsExist() {
-        List<String> hand = new ArrayList<String>();
-        hand.add("2 Spot");
-        hand.add("8 Spot");
-        hand.add("West");
-
         List<Hand> handLibrary = new ArrayList<Hand>();
         handLibrary.add(new Hand("Seven Twins", null));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
-        List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatchesWithOwnWind(hand, TileSet.Winds.West);
+        List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatchesWithOwnWind(
+                Tile.S2.v + Tile.S8.v + Tile.WW.v,
+                0L,
+                0L,
+                0L,
+                TileSet.Winds.West);
 
         assertThat(matchesWithOwnWind.size(), is(0));
     }
