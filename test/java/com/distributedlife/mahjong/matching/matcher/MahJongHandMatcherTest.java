@@ -1,24 +1,28 @@
 package com.distributedlife.mahjong.matching.matcher;
 
 import com.distributedlife.mahjong.matching.filter.MatchingHandFilter;
+import com.distributedlife.mahjong.matching.hand.HandLibrary;
 import com.distributedlife.mahjong.matching.sorter.MatchingHandSorter;
-import com.distributedlife.mahjong.reference.data.TileSet;
 import com.distributedlife.mahjong.reference.hand.Hand;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.distributedlife.mahjong.reference.data.TileSet.Tile;
 import static com.distributedlife.mahjong.reference.data.TileSet.Winds;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MahJongHandMatcherTest {
     @Test
     public void shouldMatchEntriesInTheHandLibrary() {
-        List<Hand> handLibrary = new ArrayList<Hand>();
-        handLibrary.add(new Hand("Run, Pung and a Pair", runPungAndAPairBamboo()));
+        HandLibrary handLibrary = mock(HandLibrary.class);
+        when(handLibrary.getHandSources()).thenReturn(Arrays.asList("/run-pung-and-a-pair.json"));
+        when(handLibrary.loadFromJson("/run-pung-and-a-pair.json")).thenReturn(Arrays.asList(new Hand("Run, Pung and a Pair", runPungAndAPairBamboo())));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
         List<Match> matches = mahJongHandMatcher.getMatches(
@@ -34,9 +38,13 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldPickTheBestMatchForAHand() {
-        List<Hand> handLibrary = new ArrayList<Hand>();
-        handLibrary.add(new Hand("Run, Pung and a Pair", runPungAndAPairBamboo()));
-        handLibrary.add(new Hand("Run, Pung and a Pair", runPungAndAPairSpot()));
+        List<Hand> handArrayList = new ArrayList<Hand>();
+        handArrayList.add(new Hand("Run, Pung and a Pair", runPungAndAPairBamboo()));
+        handArrayList.add(new Hand("Run, Pung and a Pair", runPungAndAPairSpot()));
+
+        HandLibrary handLibrary = mock(HandLibrary.class);
+        when(handLibrary.getHandSources()).thenReturn(Arrays.asList("/run-pung-and-a-pair.json"));
+        when(handLibrary.loadFromJson("/run-pung-and-a-pair.json")).thenReturn(handArrayList);
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
         List<Match> matches = mahJongHandMatcher.getMatches(
@@ -52,9 +60,10 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldMatchEachDifferentHandOrderedByMatchCount() {
-        List<Hand> handLibrary = new ArrayList<Hand>();
-        handLibrary.add(new Hand("Run, Pung and a Pair", runPungAndAPairSpot()));
-        handLibrary.add(new Hand("Gates of Heaven", gatesOfHeaven()));
+        HandLibrary handLibrary = mock(HandLibrary.class);
+        when(handLibrary.getHandSources()).thenReturn(Arrays.asList("/run-pung-and-a-pair.json", "/gates-of-heaven.json"));
+        when(handLibrary.loadFromJson("/run-pung-and-a-pair.json")).thenReturn(Arrays.asList(new Hand("Run, Pung and a Pair", runPungAndAPairSpot())));
+        when(handLibrary.loadFromJson("/gates-of-heaven.json")).thenReturn(Arrays.asList(new Hand("Gates of Heaven", gatesOfHeaven())));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
         List<Match> matches = mahJongHandMatcher.getMatches(
@@ -73,8 +82,9 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldConvertWindIntoOwnWindAndMatchAgain() {
-        List<Hand> handLibrary = new ArrayList<Hand>();
-        handLibrary.add(new Hand("Red Lantern", redLantern()));
+        HandLibrary handLibrary = mock(HandLibrary.class);
+        when(handLibrary.getHandSources()).thenReturn(Arrays.asList("/red-lantern.json"));
+        when(handLibrary.loadFromJson("/red-lantern.json")).thenReturn(Arrays.asList(new Hand("Red Lantern", redLantern())));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
         List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatchesWithOwnWind(
@@ -93,8 +103,9 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldReturnASevenPairsHandIfAtLeastOnePairExists() {
-        List<Hand> handLibrary = new ArrayList<Hand>();
-        handLibrary.add(new Hand("Seven Twins", null));
+        HandLibrary handLibrary = mock(HandLibrary.class);
+        when(handLibrary.getHandSources()).thenReturn(Arrays.asList("/seven-twins.json"));
+        when(handLibrary.loadFromJson("/seven-twins.json")).thenReturn(Arrays.asList(new Hand("Seven Twins", null)));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
         List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatches(
@@ -117,8 +128,9 @@ public class MahJongHandMatcherTest {
         hand.add("2 Spot");
         hand.add("2 Spot");
 
-        List<Hand> handLibrary = new ArrayList<Hand>();
-        handLibrary.add(new Hand("Seven Twins", null));
+        HandLibrary handLibrary = mock(HandLibrary.class);
+        when(handLibrary.getHandSources()).thenReturn(Arrays.asList("/seven-twins.json"));
+        when(handLibrary.loadFromJson("/seven-twins.json")).thenReturn(Arrays.asList(new Hand("Seven Twins", null)));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
         List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatches(
@@ -136,8 +148,9 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldReturnASevenPairsHandIfAtKongExists() {
-        List<Hand> handLibrary = new ArrayList<Hand>();
-        handLibrary.add(new Hand("Seven Twins", null));
+        HandLibrary handLibrary = mock(HandLibrary.class);
+        when(handLibrary.getHandSources()).thenReturn(Arrays.asList("/seven-twins.json"));
+        when(handLibrary.loadFromJson("/seven-twins.json")).thenReturn(Arrays.asList(new Hand("Seven Twins", null)));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
         List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatches(
@@ -155,8 +168,9 @@ public class MahJongHandMatcherTest {
 
     @Test
     public void shouldNotReturnASevenPairsHandIfNoPairsExist() {
-        List<Hand> handLibrary = new ArrayList<Hand>();
-        handLibrary.add(new Hand("Seven Twins", null));
+        HandLibrary handLibrary = mock(HandLibrary.class);
+        when(handLibrary.getHandSources()).thenReturn(Arrays.asList("/seven-twins.json"));
+        when(handLibrary.loadFromJson("/seven-twins.json")).thenReturn(Arrays.asList(new Hand("Seven Twins", null)));
 
         MahJongHandMatcher mahJongHandMatcher = new MahJongHandMatcher(new MatchingHandSorter(), new MatchingHandFilter(handLibrary));
         List<Match> matchesWithOwnWind = mahJongHandMatcher.getMatchesWithOwnWind(
@@ -164,7 +178,7 @@ public class MahJongHandMatcherTest {
                 0L,
                 0L,
                 0L,
-                TileSet.Winds.West);
+                Winds.West);
 
         assertThat(matchesWithOwnWind.size(), is(0));
     }

@@ -1,10 +1,13 @@
 package com.distributedlife.mahjong.matching.filter;
 
+import com.distributedlife.mahjong.matching.hand.HandLibrary;
+import com.distributedlife.mahjong.matching.hand.HandSourceReader;
 import com.distributedlife.mahjong.matching.matcher.Match;
 import com.distributedlife.mahjong.reference.adapter.ArrayOfTilesToBitFieldConverter;
 import com.distributedlife.mahjong.reference.data.TileSet;
 import com.distributedlife.mahjong.reference.hand.Hand;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,9 +16,9 @@ import static com.distributedlife.mahjong.reference.data.TileSet.Tile;
 
 public class MatchingHandFilter {
     private static final int NOT_FOUND = -1;
-    private final List<Hand> handLibrary;
+    private HandLibrary handLibrary;
 
-    public MatchingHandFilter(List<Hand> handLibrary) {
+    public MatchingHandFilter(HandLibrary handLibrary) {
         this.handLibrary = handLibrary;
     }
 
@@ -40,18 +43,26 @@ public class MatchingHandFilter {
     public List<Match> findAllHandsWithAtLeastOneMatch(Long part1, Long part2, Long part3, Long part4) {
         List<Match> allMatches = new ArrayList<Match>();
 
-        for (Hand potentialHand : handLibrary) {
+        for (String source : handLibrary.getHandSources()) {
+            //                HandSourceReader reader = new HandSourceReader(new FileInputStream(getClass().getResource(source).getFile()));
+            HandSourceReader reader = new HandSourceReader(null, new File(getClass().getResource(source).getFile()));
 
-            if (potentialHand.getName().equals("Seven Twins")) {
-                Match match = handleSevenTwinsHand(part1, part2, part3, part4);
-                if (match != null) {
-                    allMatches.add(match);
+            String line;
+            while(!(line = reader.readLine()).equals("")) {
+                Hand potentialHand = reader.getHandFromLine(line);
+
+                if (potentialHand.getName().equals("Seven Twins")) {
+                    Match match = handleSevenTwinsHand(part1, part2, part3, part4);
+                    if (match != null) {
+                        allMatches.add(match);
+                    }
+                    continue;
                 }
 
-                continue;
-            }
+                if (!potentialHand.isPartialMatch(part1)) {
+                    continue;
+                }
 
-            if (potentialHand.isPartialMatch(part1)) {
                 List<String> matchingTiles = ArrayOfTilesToBitFieldConverter.convertFromBitField(
                         potentialHand.getPart1() & part1,
                         potentialHand.getPart2() & part2,
@@ -59,22 +70,49 @@ public class MatchingHandFilter {
                         potentialHand.getPart4() & part4
                 );
 
-                Match match = new Match(
-                        potentialHand.getName(),
-                        matchingTiles.size(),
-                        matchingTiles,
-                        ArrayOfTilesToBitFieldConverter.convertFromBitField(
-                                potentialHand.getPart1(),
-                                potentialHand.getPart2(),
-                                potentialHand.getPart3(),
-                                potentialHand.getPart4()
-                        )
-                );
-                allMatches.add(match);
+                Match currentBestMatch = getCurrentBestMatchForPotentialHand(allMatches, potentialHand);
+                if (currentBestMatch == null) {
+                    addMatchToAllMatches(allMatches, potentialHand, matchingTiles);
+                } else {
+                    if (matchingTiles.size() > currentBestMatch.getMatchingTiles().size()) {
+                        allMatches.remove(currentBestMatch);
+                        addMatchToAllMatches(allMatches, potentialHand, matchingTiles);
+                    }
+                }
             }
+
+            reader.close();
         }
 
         return allMatches;
+    }
+
+    private Match getCurrentBestMatchForPotentialHand(List<Match> allMatches, Hand potentialHand) {
+        Match currentBestMatch = null;
+        for(Match match : allMatches) {
+            if (!match.getName().equals(potentialHand.getName())) {
+                continue;
+            }
+
+            currentBestMatch = match;
+            break;
+        }
+        return currentBestMatch;
+    }
+
+    private void addMatchToAllMatches(List<Match> allMatches, Hand potentialHand, List<String> matchingTiles) {
+        Match betterMatch = new Match(
+                potentialHand.getName(),
+                matchingTiles.size(),
+                matchingTiles,
+                ArrayOfTilesToBitFieldConverter.convertFromBitField(
+                        potentialHand.getPart1(),
+                        potentialHand.getPart2(),
+                        potentialHand.getPart3(),
+                        potentialHand.getPart4()
+                )
+        );
+        allMatches.add(betterMatch );
     }
 
     private Match handleSevenTwinsHand(Long part1, Long part2, Long part3, Long part4) {

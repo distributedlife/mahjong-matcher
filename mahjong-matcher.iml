@@ -15,6 +15,9 @@
     <orderEntry type="library" name="mahjong-reference" level="project" />
     <orderEntry type="library" name="json-20131018" level="project" />
     <orderEntry type="library" name="commons-io-2.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="mockito-all-1.9.5" level="project" />
+    <orderEntry type="library" scope="TEST" name="joda-time-2.3" level="project" />
+    <orderEntry type="library" name="joda-time-2.3" level="project" />
   </component>
 </module>
 
